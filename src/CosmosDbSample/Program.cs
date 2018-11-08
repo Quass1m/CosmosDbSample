@@ -1,16 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.IO;
-using System.Net.Http;
-using System.Text;
-
-namespace CosmosDbTests
+﻿namespace CosmosDbTests
 {
-    class Program
+    using Microsoft.Extensions.Configuration;
+    using System;
+    using System.IO;
+    using System.Net.Http;
+    using System.Text;
+    using System.Threading.Tasks;
+
+    public class Program
     {
         private static IConfiguration Configuration { get; set; }
 
-        static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var env = Environment.GetEnvironmentVariable("COMPUTERNAME", EnvironmentVariableTarget.Process);
 
@@ -61,13 +62,13 @@ namespace CosmosDbTests
                 message.Headers.Add("Accept", dataFormat);
                 message.Content = new StringContent("{\"id\":\"" + Guid.NewGuid() +"\",\"number\":" + DateTime.Now.Ticks + "}", Encoding.UTF8, dataFormat);
 
-                var res = client.SendAsync(message).GetAwaiter().GetResult();
+                var res = await client.SendAsync(message);
                 Console.WriteLine(res.StatusCode);
             }
         }
 
         // https://docs.microsoft.com/en-gb/rest/api/cosmos-db/access-control-on-cosmosdb-resources?redirectedfrom=MSDN
-        static string GenerateAuthToken(string verb, string resourceType, string resourceId, string date, string key, string keyType, string tokenVersion)
+        private static string GenerateAuthToken(string verb, string resourceType, string resourceId, string date, string key, string keyType, string tokenVersion)
         {
             var hmacSha256 = new System.Security.Cryptography.HMACSHA256 { Key = Convert.FromBase64String(key) };
 
